@@ -15,9 +15,9 @@ return new class extends Migration {
             $table->string('dni', 15)->unique(); // DNI
             $table->string('name', 100); // NAME
             $table->string('phone', 15)->nullable(); // PHONE
-            $table->unsignedSmallInteger('ciclo')->nullable(); // CICLO (usamos smallint para números pequeños)
+            $table->string('ciclo')->nullable();
             $table->string('email', 100)->unique(); // EMAIL (Único)
-            $table->string('status', 20)->default('activo'); // STATUS
+            $table->string('status', 20)->default('Activo'); // STATUS
             $table->timestamps();
         });
     }
