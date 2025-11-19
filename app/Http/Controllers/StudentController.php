@@ -12,9 +12,9 @@ class StudentController extends Controller
 {
     public function index()
     {
-        $students = Student::orderBy('name')->paginate(10); 
+        $students = Student::orderBy('name')->paginate(10);
         $courses = Course::all();
-        
+
         return view('students.index', compact('students', 'courses'));
     }
 
@@ -38,7 +38,7 @@ class StudentController extends Controller
             'status' => 'required|string|max:20',
             'course_id' => 'required|exists:courses,id', // ¡Validación crucial!
         ]);
-        
+
         // 2. Crear el estudiante
         $student = Student::create($request->except('course_id')); // Excluimos course_id del create del Student
 
@@ -46,12 +46,12 @@ class StudentController extends Controller
         $courseId = $request->input('course_id');
         $student->courses()->attach($courseId, [
             // Definimos los campos extra de la tabla pivot 'enrollments'
-            'status' => 'Matriculado', 
+            'status' => 'Matriculado',
             'registration_date' => now(),
         ]);
 
         return redirect()->route('students.index')
-                         ->with('success', 'Estudiante y matrícula registrados exitosamente.');
+            ->with('success', 'Estudiante y matrícula registrados exitosamente.');
     }
 
 
@@ -74,12 +74,24 @@ class StudentController extends Controller
             'email' => ['required', 'email', 'max:100', Rule::unique('students', 'email')->ignore($student)],
             'ciclo' => 'required|integer|min:1',
             'status' => 'required|string|max:20',
+
+            // ✔ Validamos el curso
+            'course_id' => 'required|exists:courses,id',
         ]);
 
-        $student->update($request->all());
+        $student->update($request->except('course_id'));
+
+        $courseId = $request->input('course_id');
+
+        $student->courses()->sync([
+            $courseId => [
+                'status' => 'Matriculado',
+                'registration_date' => now(),
+            ]
+        ]);
 
         return redirect()->route('students.index')
-                         ->with('success', 'Datos del estudiante actualizados exitosamente.');
+            ->with('success', 'Datos del estudiante actualizados exitosamente.');
     }
 
     /**
@@ -93,6 +105,6 @@ class StudentController extends Controller
         $student->delete();
 
         return redirect()->route('students.index')
-                         ->with('success', 'Estudiante eliminado exitosamente.');
+            ->with('success', 'Estudiante eliminado exitosamente.');
     }
 }

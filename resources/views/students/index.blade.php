@@ -75,14 +75,15 @@
                                 </td>
                                 <td class="px-3 py-4 whitespace-nowrap">
                                     @php $is_active = in_array($student->status, ['Activo', 'Activado', 'active']); @endphp
-                                    <span class="px-3 py-1 inline-flex text-xs font-medium rounded-md
-                                                {{ $is_active ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800' }}">
+                                    <span
+                                        class="px-3 py-1 inline-flex text-xs font-medium rounded-md
+                                                                {{ $is_active ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800' }}">
                                         {{ $student->status }}
                                     </span>
                                 </td>
 
                                 <td class="px-3 py-4 whitespace-nowrap text-xs font-medium">
-                                    <a href="{{ route('students.edit', $student) }}"
+                                    <a onclick='openEditModal(@json($student))'
                                         class="inline-flex items-center justify-center h-6 w-10 rounded-md"
                                         style="background-color: rgba(255,180,0,0.19);">
                                         <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
@@ -205,20 +206,127 @@
         </div>
     </div>
 
+    <!-- Modal Editar Estudiante -->
+    <div id="editStudentModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black/30">
+        <div class="flex items-center justify-center min-h-screen p-4">
+
+            <div class="bg-white rounded-2xl shadow-xl sm:max-w-2xl w-full">
+
+                <div class="px-8 pt-8 pb-4 flex justify-between items-center">
+                    <h3 class="text-2xl font-bold text-black font-[Kumbh_Sans]">Editar Estudiante</h3>
+
+                    <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <form id="editStudentForm" method="POST">
+                    @csrf
+                    @method('PUT')
+
+                    <div class="px-8 pb-8 space-y-5">
+
+                        <div>
+                            <label class="block text-sm font-bold text-black mb-1">Apellidos y Nombres</label>
+                            <input type="text" id="edit_name" name="name" required
+                                class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm text-gray-700 placeholder-gray-500 focus:ring-2 focus:ring-[#0B0641]">
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-bold text-black mb-1">Correo Electrónico</label>
+                                <input type="email" id="edit_email" name="email" required
+                                    class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm text-gray-700 placeholder-gray-500 focus:ring-2 focus:ring-[#0B0641]">
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-black mb-1">DNI</label>
+                                <input type="text" maxlength="8" id="edit_dni" name="dni" required
+                                    class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm text-gray-700 placeholder-gray-500 focus:ring-2 focus:ring-[#0B0641]">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-black mb-1">Número Telefónico</label>
+                            <input type="text" maxlength="9" id="edit_phone" name="phone" required
+                                class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm text-gray-700 placeholder-gray-500 focus:ring-2 focus:ring-[#0B0641]">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-black mb-1">Curso</label>
+                            <select id="edit_course_id" name="course_id" required
+                                class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm text-gray-600 cursor-pointer focus:ring-2 focus:ring-[#0B0641]">
+                                <option value="" disabled>Seleccione el curso</option>
+                                @foreach($courses as $course)
+                                    <option value="{{ $course->id }}">{{ $course->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-bold text-black mb-1">Estado</label>
+                                <select id="edit_status" name="status" required
+                                    class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm text-gray-600 cursor-pointer focus:ring-2 focus:ring-[#0B0641]">
+                                    <option value="Activo">Activo</option>
+                                    <option value="Inactivo">Inactivo</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-bold text-black mb-1">Ciclo</label>
+                                <select id="edit_ciclo" name="ciclo" required
+                                    class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm text-gray-600 cursor-pointer focus:ring-2 focus:ring-[#0B0641]">
+                                    <option disabled>Seleccione el Ciclo</option>
+                                    <option value="1">I</option>
+                                    <option value="2">II</option>
+                                    <option value="3">III</option>
+                                    <option value="4">IV</option>
+                                    <option value="5">V</option>
+                                    <option value="6">VI</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="pt-4">
+                            <button type="submit"
+                                class="w-full py-3 text-white font-bold text-lg rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#0B0641]"
+                                style="background-color: #003366;">
+                                Guardar Cambios
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
     <script>
-        function openModal() {
-            document.getElementById('createStudentModal').classList.remove('hidden');
+        function openEditModal(student) {
+            document.getElementById('editStudentModal').classList.remove('hidden');
+
+            document.getElementById('editStudentForm').action = `/students/${student.id}`;
+
+            document.getElementById('edit_name').value = student.name;
+            document.getElementById('edit_email').value = student.email;
+            document.getElementById('edit_dni').value = student.dni;
+            document.getElementById('edit_phone').value = student.phone;
+            document.getElementById('edit_course_id').value = student.course_id;
+            document.getElementById('edit_status').value = student.status;
+            document.getElementById('edit_ciclo').value = student.ciclo;
+
             document.getElementById('modalBackdrop').classList.remove('hidden');
         }
 
-        function closeModal() {
-            document.getElementById('createStudentModal').classList.add('hidden');
+        function closeEditModal() {
+            document.getElementById('editStudentModal').classList.add('hidden');
             document.getElementById('modalBackdrop').classList.add('hidden');
         }
-
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') closeModal();
-        });
     </script>
 
 @endsection
