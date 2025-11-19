@@ -10,16 +10,14 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('courses', function (Blueprint $table) {
+        Schema::create('teachers', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 100)->unique();
-            $table->unsignedBigInteger('fk_teacher');
-
+            $table->string('dni', 15)->unique();
+            $table->string('name', 100);
+            $table->string('phone', 15)->nullable();
+            $table->string('email', 100)->unique();
+            $table->string('status', 20)->default('activo');
             $table->timestamps();
-            $table->foreign('fk_teacher')
-                ->references('id')
-                ->on('teachers')
-                ->onDelete('restrict');
         });
     }
 
