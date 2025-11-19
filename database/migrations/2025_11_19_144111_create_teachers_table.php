@@ -11,13 +11,13 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('teachers', function (Blueprint $table) {
-            $table->id(); // ID (Primary Key)
-            $table->string('dni', 15)->unique(); // DNI (Único)
-            $table->string('name', 100); // NAME
-            $table->string('phone', 15)->nullable(); // PHONE (opcional)
-            $table->string('email', 100)->unique(); // EMAIL (Único)
-            $table->string('status', 20)->default('activo'); // STATUS
-            $table->timestamps(); // created_at y updated_at
+            $table->id();
+            $table->string('dni', 15)->unique();
+            $table->string('name', 100);
+            $table->string('phone', 15)->nullable();
+            $table->string('email', 100)->unique();
+            $table->string('status', 20)->default('activo');
+            $table->timestamps();
         });
     }
 
