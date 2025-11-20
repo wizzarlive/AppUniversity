@@ -16,14 +16,14 @@ class Teacher extends Model
         'email',
         'status',
     ];
-    
+
 
     public function courses()
     {
         return $this->hasMany(Course::class, 'fk_teacher');
     }
 
-    
+
     public function tuitionsProcessed()
     {
         return $this->hasMany(Tuition::class, 'fk_teacher_processed');
