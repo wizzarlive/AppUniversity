@@ -4,7 +4,11 @@
 
 @section('content')
 
-<div class="p-0">
+<div class="p-0" x-data="{ openCreate: false, openEdit: false, teacher: {}, selectedCourses: [] }" x-cloak>
+
+    <style>
+        [x-cloak] { display: none !important; }
+    </style>
 
     <!-- Encabezado -->
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-5 p-6 bg-white rounded-md shadow-md">
@@ -13,7 +17,7 @@
             <p class="text-base font-semibold text-gray-800 mt-1">Apartado para gestionar los profesores</p>
         </div>
 
-        <button onclick="openCreateModal()"
+        <button @click="openCreate = true"
             class="mt-4 sm:mt-0 inline-flex items-center px-4 py-3 rounded-md shadow-sm text-sm font-semibold text-white w-full sm:w-auto justify-center"
             style="background-color: #509BDB;">
             Agregar Profesor
@@ -80,7 +84,7 @@
                                 </span>
                             </td>
                             <td class="px-3 py-4 whitespace-nowrap text-xs font-medium">
-                                <a onclick='openEditModal(@json($teacher), @json($teacher->courses->pluck("id")))'
+                                <button @click="openEdit = true; teacher = {{ $teacher }}; selectedCourses = @json($teacher->courses->pluck('id'))"
                                     class="inline-flex items-center justify-center h-6 w-10 rounded-md"
                                     style="background-color: rgba(255,180,0,0.19);">
                                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"
@@ -88,7 +92,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.232 5.232z" />
                                     </svg>
-                                </a>
+                                </button>
                             </td>
                         </tr>
                     @endforeach
@@ -99,20 +103,14 @@
         <div class="p-4 border-t border-gray-200">
             {{ $teachers->links() }}
         </div>
-
     </div>
-</div>
 
-<!-- Backdrop -->
-<div id="modalBackdrop" class="fixed inset-0 bg-gray-900 bg-opacity-50 z-40 hidden"></div>
-
-<!-- Modal Crear Profesor -->
-<div id="createTeacherModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black/30">
-    <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-2xl shadow-xl sm:max-w-2xl w-full">
+    <!-- Modal Crear Profesor -->
+    <div x-show="openCreate" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div @click.away="openCreate = false" class="bg-white rounded-2xl shadow-xl sm:max-w-2xl w-full">
             <div class="px-8 pt-8 pb-4 flex justify-between items-center">
                 <h3 class="text-2xl font-bold text-black font-[Kumbh_Sans]">Añadir Nuevo Profesor</h3>
-                <button onclick="closeCreateModal()" class="text-gray-400 hover:text-gray-600">
+                <button @click="openCreate = false" class="text-gray-400 hover:text-gray-600">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
@@ -120,73 +118,66 @@
                 </button>
             </div>
 
-            <form action="{{ route('teachers.store') }}" method="POST">
+            <form action="{{ route('teachers.store') }}" method="POST" class="px-8 pb-8 space-y-5">
                 @csrf
-                <div class="px-8 pb-8 space-y-5">
+                <div>
+                    <label class="block text-sm font-bold text-black mb-1">Apellidos y Nombres</label>
+                    <input type="text" name="name" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
+                </div>
 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                        <label class="block text-sm font-bold text-black mb-1">Apellidos y Nombres</label>
-                        <input type="text" name="name" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div>
-                            <label class="block text-sm font-bold text-black mb-1">Correo Electrónico</label>
-                            <input type="email" name="email" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-bold text-black mb-1">DNI</label>
-                            <input type="text" maxlength="8" name="dni" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
-                        </div>
+                        <label class="block text-sm font-bold text-black mb-1">Correo Electrónico</label>
+                        <input type="email" name="email" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
                     </div>
 
                     <div>
-                        <label class="block text-sm font-bold text-black mb-1">Número Telefónico</label>
-                        <input type="text" maxlength="9" name="phone" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
+                        <label class="block text-sm font-bold text-black mb-1">DNI</label>
+                        <input type="text" maxlength="8" name="dni" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
                     </div>
+                </div>
 
-                    <div>
-                        <label class="block text-sm font-bold text-black mb-1">Estado</label>
-                        <select name="status" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
-                            <option value="Activo">Activo</option>
-                            <option value="Inactivo">Inactivo</option>
-                        </select>
-                    </div>
+                <div>
+                    <label class="block text-sm font-bold text-black mb-1">Número Telefónico</label>
+                    <input type="text" maxlength="9" name="phone" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
+                </div>
 
-                    <!-- SELECT MULTIPLE CREAR -->
-                    <div>
-                        <label class="block text-sm font-bold text-black mb-1">Seleccione cursos</label>
-                        <select name="courses[]" multiple class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm h-40 overflow-y-auto cursor-pointer">
-                            @foreach ($courses as $course)
-                                @php $assigned = $course->fk_teacher !== null; @endphp
-                                <option value="{{ $course->id }}" @if($assigned) disabled @endif class="whitespace-nowrap">
-                                    {{ $course->name }}
-                                    @if($assigned) (No disponible) @endif
-                                </option>
-                            @endforeach
-                        </select>
-                        <p class="text-xs text-gray-500 mt-1">Puede seleccionar varios cursos.</p>
-                    </div>
+                <div>
+                    <label class="block text-sm font-bold text-black mb-1">Estado</label>
+                    <select name="status" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
+                        <option value="Activo">Activo</option>
+                        <option value="Inactivo">Inactivo</option>
+                    </select>
+                </div>
 
-                    <div class="pt-4">
-                        <button type="submit" class="w-full py-3 text-white font-bold text-lg rounded-lg shadow-md" style="background-color: #003366;">
-                            Añadir
-                        </button>
-                    </div>
+                <div>
+                    <label class="block text-sm font-bold text-black mb-1">Seleccione cursos</label>
+                    <select name="courses[]" multiple class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm h-40 overflow-y-auto cursor-pointer">
+                        @foreach ($courses as $course)
+                            @php $assigned = $course->fk_teacher !== null; @endphp
+                            <option value="{{ $course->id }}" @if($assigned) disabled @endif>
+                                {{ $course->name }} @if($assigned) (No disponible) @endif
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">Puede seleccionar varios cursos.</p>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full py-3 text-white font-bold text-lg rounded-lg shadow-md" style="background-color: #003366;">
+                        Añadir
+                    </button>
                 </div>
             </form>
         </div>
     </div>
-</div>
 
-<!-- Modal Editar Profesor -->
-<div id="editTeacherModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black/30">
-    <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-2xl shadow-xl sm:max-w-2xl w-full">
+    <!-- Modal Editar Profesor -->
+    <div x-show="openEdit" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div @click.away="openEdit = false" class="bg-white rounded-2xl shadow-xl sm:max-w-2xl w-full">
             <div class="px-8 pt-8 pb-4 flex justify-between items-center">
                 <h3 class="text-2xl font-bold text-black font-[Kumbh_Sans]">Editar Profesor</h3>
-                <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600">
+                <button @click="openEdit = false" class="text-gray-400 hover:text-gray-600">
                     <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
@@ -194,104 +185,63 @@
                 </button>
             </div>
 
-            <form id="editTeacherForm" method="POST">
+            <form :action="`/teachers/${teacher.id}`" method="POST" class="px-8 pb-8 space-y-5">
                 @csrf
                 @method('PUT')
-                <div class="px-8 pb-8 space-y-5">
 
+                <div>
+                    <label class="block text-sm font-bold text-black mb-1">Apellidos y Nombres</label>
+                    <input type="text" name="name" x-model="teacher.name" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                        <label class="block text-sm font-bold text-black mb-1">Apellidos y Nombres</label>
-                        <input type="text" id="edit_name" name="name" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div>
-                            <label class="block text-sm font-bold text-black mb-1">Correo Electrónico</label>
-                            <input type="email" id="edit_email" name="email" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
-                        </div>
-
-                        <div>
-                            <label class="block text-sm font-bold text-black mb-1">DNI</label>
-                            <input type="text" maxlength="8" id="edit_dni" name="dni" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
-                        </div>
+                        <label class="block text-sm font-bold text-black mb-1">Correo Electrónico</label>
+                        <input type="email" name="email" x-model="teacher.email" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
                     </div>
 
                     <div>
-                        <label class="block text-sm font-bold text-black mb-1">Número Telefónico</label>
-                        <input type="text" maxlength="9" id="edit_phone" name="phone" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
+                        <label class="block text-sm font-bold text-black mb-1">DNI</label>
+                        <input type="text" maxlength="8" name="dni" x-model="teacher.dni" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
                     </div>
+                </div>
 
-                    <div>
-                        <label class="block text-sm font-bold text-black mb-1">Estado</label>
-                        <select id="edit_status" name="status" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
-                            <option value="Activo">Activo</option>
-                            <option value="Inactivo">Inactivo</option>
-                        </select>
-                    </div>
+                <div>
+                    <label class="block text-sm font-bold text-black mb-1">Número Telefónico</label>
+                    <input type="text" maxlength="9" name="phone" x-model="teacher.phone" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
+                </div>
 
-                    <!-- SELECT MULTIPLE EDITAR -->
-                    <div>
-                        <label class="block text-sm font-bold text-black mb-1">Seleccione cursos</label>
-                        <select name="courses[]" id="edit_courses" multiple class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm h-40 overflow-y-auto cursor-pointer">
-                            @foreach ($courses as $course)
-                                @php
-                                    $assigned = $course->teacher ? true : false;
-                                    $isMine = isset($teacher) && $course->fk_teacher == $teacher->id;
-                                @endphp
-                                <option value="{{ $course->id }}" @if($isMine) selected @endif @if($assigned && !$isMine) disabled @endif class="whitespace-nowrap">
-                                    {{ $course->name }}
-                                    @if($assigned) (Asignado a: {{ $course->teacher->name }}) @endif
-                                </option>
-                            @endforeach
-                        </select>
-                        <p class="text-xs text-gray-500 mt-1">Puede seleccionar varios cursos.</p>
-                    </div>
+                <div>
+                    <label class="block text-sm font-bold text-black mb-1">Estado</label>
+                    <select name="status" x-model="teacher.status" required class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm">
+                        <option value="Activo">Activo</option>
+                        <option value="Inactivo">Inactivo</option>
+                    </select>
+                </div>
 
-                    <div class="pt-4">
-                        <button type="submit" class="w-full py-3 text-white font-bold text-lg rounded-lg shadow-md" style="background-color: #003366;">
-                            Guardar Cambios
-                        </button>
-                    </div>
+                <div>
+                    <label class="block text-sm font-bold text-black mb-1">Seleccione cursos</label>
+                    <select name="courses[]" multiple x-model="selectedCourses" class="w-full bg-[#EEEEEE] rounded-md py-3 px-4 text-sm h-40 overflow-y-auto cursor-pointer">
+                        @foreach ($courses as $course)
+                            <option value="{{ $course->id }}">
+                                {{ $course->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">Puede seleccionar varios cursos.</p>
+                </div>
+
+                <div class="pt-4">
+                    <button type="submit" class="w-full py-3 text-white font-bold text-lg rounded-lg shadow-md" style="background-color: #003366;">
+                        Guardar Cambios
+                    </button>
                 </div>
             </form>
         </div>
     </div>
+
 </div>
 
-<script>
-function openCreateModal() {
-    document.getElementById('createTeacherModal').classList.remove('hidden');
-    document.getElementById('modalBackdrop').classList.remove('hidden');
-}
-
-function closeCreateModal() {
-    document.getElementById('createTeacherModal').classList.add('hidden');
-    document.getElementById('modalBackdrop').classList.add('hidden');
-}
-
-function openEditModal(teacher, courseIds) {
-    document.getElementById('editTeacherModal').classList.remove('hidden');
-    document.getElementById('modalBackdrop').classList.remove('hidden');
-
-    document.getElementById('editTeacherForm').action = `/teachers/${teacher.id}`;
-
-    document.getElementById('edit_name').value = teacher.name;
-    document.getElementById('edit_email').value = teacher.email;
-    document.getElementById('edit_dni').value = teacher.dni;
-    document.getElementById('edit_phone').value = teacher.phone;
-    document.getElementById('edit_status').value = teacher.status;
-
-    // Seleccionar cursos
-    const select = document.getElementById('edit_courses');
-    Array.from(select.options).forEach(opt => {
-        opt.selected = courseIds.includes(parseInt(opt.value));
-    });
-}
-
-function closeEditModal() {
-    document.getElementById('editTeacherModal').classList.add('hidden');
-    document.getElementById('modalBackdrop').classList.add('hidden');
-}
-</script>
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 
 @endsection
