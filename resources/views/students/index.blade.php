@@ -77,7 +77,7 @@
                                     @php $is_active = in_array($student->status, ['Activo', 'Activado', 'active']); @endphp
                                     <span
                                         class="px-3 py-1 inline-flex text-xs font-medium rounded-md
-                                                                {{ $is_active ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800' }}">
+                                                                        {{ $is_active ? 'bg-green-200 text-green-800' : 'bg-red-200 text-red-800' }}">
                                         {{ $student->status }}
                                     </span>
                                 </td>
@@ -321,6 +321,16 @@
             document.getElementById('edit_ciclo').value = student.ciclo;
 
             document.getElementById('modalBackdrop').classList.remove('hidden');
+        }
+
+        function openModal() {
+            document.getElementById('createStudentModal').classList.remove('hidden');
+            document.getElementById('modalBackdrop').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('createStudentModal').classList.add('hidden');
+            document.getElementById('modalBackdrop').classList.add('hidden');
         }
 
         function closeEditModal() {
