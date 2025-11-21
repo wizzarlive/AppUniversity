@@ -9,6 +9,8 @@ class Tuition extends Model
 {
     use HasFactory;
 
+    protected $table = 'tuitions';
+
     protected $fillable = [
         'period',
         'status',
@@ -17,14 +19,15 @@ class Tuition extends Model
         'fk_teacher_processed',
     ];
 
+    // Relación con Student
     public function student()
     {
         return $this->belongsTo(Student::class, 'fk_student');
     }
 
-
-    public function processor()
+    // Relación con Teacher
+    public function teacher()
     {
-        return $this->belongsTo(Teacher::class, 'fk_teacher_processed'); 
+        return $this->belongsTo(Teacher::class, 'fk_teacher_processed');
     }
 }

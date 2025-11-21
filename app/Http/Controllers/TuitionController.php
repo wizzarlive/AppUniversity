@@ -2,64 +2,56 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Tuition;
 use Illuminate\Http\Request;
+use App\Models\Tuition;
+use App\Models\Student;
+use App\Models\Teacher;
 
 class TuitionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $tuitions = Tuition::with(['student', 'teacher'])->get();
+        $students = Student::all();
+        $periods = ['202025','202026','202027','202028']; // o genera dinámicamente
+        $statuses = ['Matriculado', 'Pendiente'];
+
+        return view('tuitions.index', compact('tuitions', 'students', 'periods', 'statuses'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'fk_student' => 'required|exists:students,id',
+            'period' => 'required|string',
+            'status' => 'required|string',
+        ]);
+
+        $tuition = Tuition::create([
+            'fk_student' => $request->fk_student,
+            'period' => $request->period,
+            'status' => $request->status,
+            'registration_date' => now()->format('Y-m-d'),
+            'fk_teacher_processed' => auth()->id(), // usuario autenticado
+        ]);
+
+        return redirect()->route('tuitions.index')->with('success', 'Matrícula creada correctamente');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Tuition $tuition)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Tuition $tuition)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(Request $request, Tuition $tuition)
     {
-        //
-    }
+        $request->validate([
+            'status' => 'required|string',
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Tuition $tuition)
-    {
-        //
+        $tuition->update([
+            'status' => $request->status,
+        ]);
+
+        // responder JSON para actualización live
+        return response()->json([
+            'id' => $tuition->id,
+            'status' => $tuition->status,
+        ]);
     }
 }
