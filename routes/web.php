@@ -11,7 +11,7 @@ use App\Http\Controllers\TuitionController;
 
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 
 Route::get('/dashboard', function () {
@@ -35,6 +35,9 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/courses/{course}/enroll', [CourseController::class, 'enrollStudent'])
         ->name('courses.enroll');
+
+    Route::put('/courses/{course}/students/{student}', [CourseController::class, 'updateEnrollment'])
+        ->name('courses.updateEnrollment');
 
 });
 

@@ -92,4 +92,19 @@ class CourseController extends Controller
 
         return back()->with('success', 'Estudiante inscrito correctamente.');
     }
+
+    public function updateEnrollment(Request $request, Course $course, Student $student)
+    {
+        $request->validate([
+            'grade' => 'nullable|numeric|min:0|max:20',
+            'status' => 'required|string|max:20',
+        ]);
+
+        $course->students()->updateExistingPivot($student->id, [
+            'grade' => $request->grade,
+            'status' => $request->status,
+        ]);
+
+        return back()->with('success', 'Datos actualizados correctamente.');
+    }
 }
