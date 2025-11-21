@@ -6,8 +6,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\CourseController;
 use App\Http\Controllers\TuitionController;
-
-
+use App\Http\Controllers\DashboardController;
 
 
 Route::get('/', function () {
@@ -40,6 +39,8 @@ Route::middleware('auth')->group(function () {
 
     Route::put('/courses/{course}/students/{student}', [CourseController::class, 'updateEnrollment'])
         ->name('courses.updateEnrollment');
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
 });
 
