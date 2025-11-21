@@ -50,7 +50,8 @@
         <div id="courseGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
 
             @foreach ($courses as $course)
-                <div class="course-card p-6 rounded-xl shadow-lg text-white hover:scale-[1.03] transition-all"
+                <a href="{{ route('courses.show', $course->id) }}"
+                    class="course-card block p-6 rounded-xl shadow-lg text-white hover:scale-[1.03] transition-all"
                     style="background: linear-gradient(90deg, #2F0113 0%, #0B0641 100%);">
 
                     <h3 class="text-xl font-bold">{{ $course->name }}</h3>
@@ -64,18 +65,8 @@
                         @endif
                     </p>
 
-                    <div class="flex gap-2 mt-4">
+                </a>
 
-                        <!-- EDITAR -->
-                        <button onclick="openEditCourseModal({{ $course->id }}, '{{ $course->name }}')"
-                            class="bg-yellow-500 hover:bg-yellow-600 px-3 py-1 rounded text-sm">
-                            Editar
-                        </button>
-
-                        <!-- ELIMINAR (ELIMINADO) -->
-
-                    </div>
-                </div>
             @endforeach
 
         </div>

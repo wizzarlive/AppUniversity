@@ -25,7 +25,8 @@ class Student extends Model
     public function courses()
     {
         return $this->belongsToMany(Course::class, 'enrollments', 'fk_student', 'fk_course')
-                    ->withPivot('status', 'registration_date')
-                    ->withTimestamps();
+            ->withPivot('status', 'registration_date')
+            ->withTimestamps();
     }
+
 }

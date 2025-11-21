@@ -28,6 +28,14 @@ Route::middleware('auth')->group(function () {
     Route::resource('teachers', TeacherController::class);
     Route::resource('tuitions', TuitionController::class);
     Route::resource('courses', CourseController::class);
+
+    Route::get('/courses/{id}', [CourseController::class, 'show'])->name('courses.show');
+    Route::post('/courses/{id}/add-student', [CourseController::class, 'addStudent'])
+        ->name('courses.addStudent');
+
+    Route::post('/courses/{course}/enroll', [CourseController::class, 'enrollStudent'])
+        ->name('courses.enroll');
+
 });
 
 

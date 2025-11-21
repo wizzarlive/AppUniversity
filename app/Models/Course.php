@@ -23,14 +23,14 @@ class Course extends Model
 
     public function enrollments()
     {
-        return $this->hasMany(Enrollment::class, 'FK_COURSE');
+        return $this->hasMany(Enrollment::class, 'fk_course');
     }
-
 
     public function students()
     {
-        return $this->belongsToMany(Student::class, 'enrollments', 'FK_COURSE', 'FK_STUDENT')
-                    ->withPivot('grade', 'status', 'registration_date')
-                    ->using(Enrollment::class);
+        return $this->belongsToMany(Student::class, 'enrollments', 'fk_course', 'fk_student')
+            ->withPivot('grade', 'status', 'registration_date')
+            ->using(Enrollment::class);
     }
+
 }

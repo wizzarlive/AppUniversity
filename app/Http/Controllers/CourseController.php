@@ -5,7 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
-
+use App\Models\Student;
+use App\Models\Enrollment;
 class CourseController extends Controller
 {
 
@@ -19,6 +20,13 @@ class CourseController extends Controller
     {
         $teachers = Teacher::all();
         return view('courses.create', compact('teachers'));
+    }
+
+    public function show(Course $course)
+    {
+        $students = Student::orderBy('name')->get();
+
+        return view('course.show', compact('course', 'students'));
     }
 
 
@@ -58,5 +66,30 @@ class CourseController extends Controller
     {
         $course->delete();
         return redirect()->route('courses.index')->with('success', 'Curso eliminado.');
+    }
+
+
+
+    public function enrollStudent(Request $request, Course $course)
+    {
+        $request->validate([
+            'student_id' => 'required|exists:students,id',
+            'grade' => 'nullable|numeric|min:0|max:20',
+            'status' => 'required|string',
+        ]);
+
+        // Evitar duplicados
+        if ($course->students()->where('students.id', $request->student_id)->exists()) {
+            return back()->with('error', 'El estudiante ya está inscrito en este curso.');
+        }
+
+        // Inscribir
+        $course->students()->attach($request->student_id, [
+            'grade' => $request->grade,
+            'status' => $request->status,
+            'registration_date' => now(),
+        ]);
+
+        return back()->with('success', 'Estudiante inscrito correctamente.');
     }
 }
